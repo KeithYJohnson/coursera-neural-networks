@@ -1,6 +1,12 @@
-%% Learns the weights of a perceptron and displays the results.
+% Learns the weights of a perceptron and displays the results.
+
+% This is from the lecture and I'm guessing is reflected somewhere in this CODE
+
+% Add an extra component with value 1 to each input vector.
+% The “bias” weight on this component is minus the threshold. Now we can forget the threshold.
+%%
 function [w] = learn_perceptron(neg_examples_nobias,pos_examples_nobias,w_init,w_gen_feas)
-%% 
+%%
 % Learns the weights of a perceptron for a 2-dimensional dataset and plots
 % the perceptron at each iteration where an iteration is defined as one
 % full pass through the data. If a generously feasible weight vector
@@ -18,6 +24,7 @@ function [w] = learn_perceptron(neg_examples_nobias,pos_examples_nobias,w_init,w
 %%
 
 %Bookkeeping
+                    % Its a 4x2 Matrix the second arg returns the number of rows
 num_neg_examples = size(neg_examples_nobias,1);
 num_pos_examples = size(pos_examples_nobias,1);
 num_err_history = [];
@@ -25,6 +32,7 @@ w_dist_history = [];
 
 %Here we add a column of ones to the examples in order to allow us to learn
 %bias parameters.
+                                    %ones creates an array of all ones
 neg_examples = [neg_examples_nobias,ones(num_neg_examples,1)];
 pos_examples = [pos_examples_nobias,ones(num_pos_examples,1)];
 
@@ -89,7 +97,7 @@ end
 
 %WRITE THE CODE TO COMPLETE THIS FUNCTION
 function [w] = update_weights(neg_examples, pos_examples, w_current)
-%% 
+%%
 % Updates the weights of the perceptron for incorrectly classified points
 % using the perceptron update algorithm. This function makes one sweep
 % over the dataset.
@@ -103,6 +111,24 @@ function [w] = update_weights(neg_examples, pos_examples, w_current)
 %   w - The weight vector after one pass through the dataset using the perceptron
 %       learning rule.
 %%
+
+%  If the output unit is correct, leave its weights alone.
+
+%  If the output unit incorrectly outputs a zero, add the input vector to the weight vector.
+                      % A bias is exactly equivalent to a weight on an extra input line that always has an activity of 1.
+                      % By adding a fictional dimension fixed to 1, its corresponding weight become the bias.
+% (w,b) <- (x,1) - (w,b) =  (2, -1, .5) + (.5, -.5, 1) = (2.5, -1.5, 1.5)
+
+
+%  If the output unit incorrectly outputs a 1, subtract the input vector from the weight vector.
+                       % A bias is exactly equivalent to a weight on an extra input line that always has an activity of 1.
+                       % By adding a fictional dimension fixed to 1, its corresponding weight become the bias.
+%  (w,b) <- (w,b) - (x,1) = (2, -1, .5) - (.5, -.5, 1) = (1.5, -.5, -.5)
+
+% If a generously feasible weight vector is provided
+
+
+
 w = w_current;
 num_neg_examples = size(neg_examples,1);
 num_pos_examples = size(pos_examples,1);
@@ -111,20 +137,32 @@ for i=1:num_neg_examples
     x = this_case'; %Hint
     activation = this_case*w;
     if (activation >= 0)
+      % input_vector = this_case
+      % weight_vector = w
+      %
+      % new_weight = weight_vector - input_vector
+      % w = new_weight
+      w = w_current - x
         %YOUR CODE HERE
     end
 end
+
 for i=1:num_pos_examples
     this_case = pos_examples(i,:);
     x = this_case';
     activation = this_case*w;
     if (activation < 0)
+      % input_vector = this_case
+      % weight_vector = w
+      % new_weight = weight_vector + input_vector
+      % w = weight
+      w = w_current + x
         %YOUR CODE HERE
     end
 end
 
 function [mistakes0, mistakes1] =  eval_perceptron(neg_examples, pos_examples, w)
-%% 
+%%
 % Evaluates the perceptron using a given weight vector. Here, evaluation
 % refers to finding the data points that the perceptron incorrectly classifies.
 % Inputs:
@@ -157,4 +195,3 @@ for i=1:num_pos_examples
         mistakes1 = [mistakes1;i];
     end
 end
-
